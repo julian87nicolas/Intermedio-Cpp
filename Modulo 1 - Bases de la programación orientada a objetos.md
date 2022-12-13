@@ -60,3 +60,17 @@ Es momento de observar como definir la clase más simple y cómo crear un objeto
 class OurClass {};
 ```
 
+Hemos definido una clase. Esta lcase es bastante pobre, no tiene propiedades ni actividades. Esto no importa por ahora. Cuanto más simple la clase mejor para nuestro propósito.
+
+La definición de la clase comienza con la palabra reservada `class` seguida de un **identificador** que nombra a la clase. Luego añadimios un par de llaves cuyo contenido interior define las propiedades y actividades de la clase.
+
+En este caso nuestra clase está vacía. 
+
+La nueva clase definida se convierte en un equivalente a un **type** y podemos usarla como un nombre de type. Si queremos crear un objeto de nuestra clase `OurClass` declaramos la variable donde almacenaremos los objetos de esta clase y crearemos un objeeto al mismo tiempo:
+```cpp
+OurClass object;
+```
+
+# Pilas: una mirada desde dos perspectivas diferentes
+
+1.2.1.1
