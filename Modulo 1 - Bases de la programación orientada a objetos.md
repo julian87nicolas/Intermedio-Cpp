@@ -1,7 +1,7 @@
 # Contenido
 * [Conceptos básicos de la programación orientada a objetos](#conceptos-básicos-de-la-programación-orientada-a-objetos)
 * [Pilas: una mirada desde dos perspectivas diferente](#pilas-una-mirada-desde-dos-perspectivas-diferentes)
-
+* [Componentes de clase](#componentes-de-clase)
 # Conceptos básicos de la programación orientada a objetos
 El lenguaje C++ fue creado como una herramienta universal para la programación orientada a objetos. Esto no significa que no podamos usarlo para otra metodología de programación. 
 
@@ -232,3 +232,113 @@ void Stack::push(int value) {
 ```
 
 > [Código de ejemplo de pilas con POO](ejemplos/POOStacks.cpp)
+
+Ahora haremos algo más. buscamos una nueva clase que no solo manipule pilas sino que también sea capaz de evaluar una suma de todos los elementos actualmente almacenados en la pila.
+
+Además no deseamos modificar la pila definida anteriormente, en otras palabras, buscamos consturir una **subclase** de la clase `Stack`.
+
+Así es como se verá:
+```cpp
+class AddingStack : Stack {
+};
+```
+La clase no define ningún nuevo componente aún, pero esto no significa que está vacío. **Esto deriva todos los componentes definidos por su superclase** - el nombre de la superclase es escrito directamente luego de los dos puntos, siguientes al nombre de la nueva clase.
+
+Cualquier objeto de la clase `AddingStack` puede hacer todo lo que los objetos de la clase `Stack` hacen.
+
+Ahora vamos a añadirle algunos nuevos trucos:
+1. Buscamos que la función `push` no solo pushee el valor en la pila, sino que tambien agregue el valor de la varaible `sum`.
+2. Buscamos que la función `pop` no solo saque valores de la pila, sino que substraiga el valor de la variable `sum`.
+
+Primero añadimos una nueva variable a la clase. Está será privada, como las varaibles previas.
+
+Luego cambiaremos la funcionalidad de las funciones sin cambiar su nombre. Podemos decir más precisamente que la interface de la clase sigue siendo la misma cuando cambiamos la implementación al mismo tiempo.
+
+```cpp
+class AddingStack : Stack {
+    private:
+        int sum;
+    public:
+        void push(int value);
+        int pop();
+};
+```
+
+Comenzaremos con la implementación de la función `push()`. Esto es lo que esperamos de ella:
+* Que añada el valor a la variable `sum`.
+* Que pushee el valor a la pila.
+
+Esta es la nueva función `push`:
+```cpp
+void AddingStack::push(int value) {
+    sum += value;
+    Stack::push(value);
+}
+```
+
+La primer sentencia es clara y no requiere explicación, pero al ver la segunda linea vemos que **no necesitamos definir la operación** de push nuevamente. La implementación de esta actividad es implementada dentro de la clase `Stack`. Lo unico que debemos hacer es usarla, pero debemos indicar claramente la clase que contiene la función para evitar confusiones con cualquier otra función con el mismo nombre.
+
+Por esto es que colocamos el prefijo `Stack::` en la invocación.
+
+De manera similar, esta es la nueva función `pop`:
+```cpp
+int AddingStack::pop() {
+    int val = Stack::pop();
+    sum -= val;
+    return val;
+}
+```
+
+Ahora definimos una nueva función, que llamaremos `get_sum` que retornará el valor de `sum`.
+```cpp
+int AddingStack::get_sum() {
+    return sum;
+}
+```
+
+Otra cosa que debemos tener en consideración es la inicialización de este valor `sum`. Este debe ser cero cuando el objeto es creado, lo cual hacemos en el constructor. Ya sabemos escribir un constructor, pero hay un punto en el que debemos enfatizar.
+
+Cuando creamos un objeto de la clase `AddingStack` debemos tener en cuenta la inicialización de la superclase también. Veamos el nuevo constructor:
+```cpp
+AddingStack::AddingStack() : Stack() {
+    sum = 0;
+}
+```
+
+La frase `: Stack()` es una petición a invocar el **constructor de la superclase** antes de que el constructor actual comience su trabajo.
+
+Veamos el código completo de la nueva clase:
+```cpp
+class AddingStack: Stack {
+    private:
+        int sum;
+    public:
+        AddingStack();
+        void push(int value);
+        int pop();
+        int get_sum();
+}
+
+AddingStack::AddingStack() : Stack () {
+    sum = 0;
+}
+
+void AddingStack::push(int value) {
+    sum += value;
+    Stack::push(value);
+}
+
+int AddingStack::pop() {
+    int val = Stack::pop();
+    sum -= val;
+    return val;
+}
+
+int AddingStack::get_sum(){
+    return sum;
+}
+```
+> [Código de ejemplo subclase de Stack](ejemplos/POOStackSubClass.cpp)
+
+# Componentes de clase
+1.3.1.1
