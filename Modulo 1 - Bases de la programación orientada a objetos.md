@@ -76,5 +76,159 @@ OurClass object;
 ```
 
 # Pilas: una mirada desde dos perspectivas diferentes
+Una pila o *stack* es una estructura desarrollada para almacenar datos de una forma muy especifica. Imaginemos una pila como una pila de monedas, podemos ir apilandolas una a una, pero para obtener una moneda debemos sacar la de la ubicación superior, no podemos quitar la de la base. Si deseamos hacer esto último debemos sacar una a una todas las monedas.
 
-1.2.1.1
+El nombre alternativo de una fila es **LIFO**, el cual es una abreviación de la descripción del comportamiento de las pilas: *"Last In - First Out"* (Primero en entrar, ultimo en salir).
+
+Una pila es un objeto de dos operaciones elementales convencionales llamadas *"push"* (cuando un nuevo elemento es ubicado en la cima) y *"pop"* (cuando un elemento existente es tomado desde la cima).
+
+## Pilas o LIFO
+Primero debemos decidir como almacenar valores que lleguen a nuestra pila. Se sugiere usar el método más simple con un vector para este trabajo. Asumiremos de forma imprudente que no hay más de 100 valores en la pila al mismo tiempo. Además supondremos que el elemento del indice 0 es la base de la pila.
+
+La pila en si es declarada aquí:
+```cpp
+int stack[100];
+```
+
+## Puntero a pila
+El arreglo no es suficiente para implementar una pila. Necesitamos algunos detalles adicionales. Por ejemplo, necesitamos una variable que sea la responsable de almacenar un numero de elementos almacenados actualmente en la pila. Esta variable es generalmente llamada *"stack pointer"* o puntero a pila, abreviado **SP**.
+
+Inicialmente, la pila está vacía, por lo que al SP se le deberá asignar un valor de 0.
+```cpp
+int SP = 0;
+```
+
+## Push
+Estamos listos para definir una función que ubique un valor en la pila. Esto es lo que supondremos:
+* El nombre de la función será `push`.
+* La función obtiene un argumento del tipo `int`.
+* La función no retorna nada.
+* La función coloca el valor del argumento en el primer elemento libre en el vector e incrementa el SP.
+
+Así es como lo haremos:
+```cpp
+void push(int value) {
+    stack[SP++] = value;
+}
+```
+
+## Pop
+Es momento de crear la función para tomar un valor de la pila. Así es como la imaginamos:
+* El nombre de la función es `pop`.
+* La función no tiene ningún argumento.
+* La función lee el valor de la cima de la pila y decrementa el SP-
+* La función retorna el valor tomado de la pila.
+
+La función resulta:
+```cpp
+int pop() {
+    return stack[--SP];
+}
+```
+
+> [Código de ejemplo de pilas](ejemplos/Stacks.cpp)
+
+## Pros y contras
+Nuestra pila está lista. Por supuesto tiene algunas falencias y la implementación puede ser mejorada de muchas formas, pero la idea general está bien y podemos usar nuestra pila si la necesitamos.
+
+Pero ...
+
+Mientras más la usemos, más **desventajas** descubriremos. Veamos algunas de ellas:
+* Dos variables esenciales (`stack` y `SP`) son completamente vulnerables; cualquiera puede modificarlas de formas incontrolables, destruyendo el efecto de la pila, esto no significa que sea malicioso, por el contrario, esto podría suceder como resultado de un descuido; imagina que por error escribimos algo como: 
+    ```cpp
+    SP = 100;
+    ```
+    El funcionamiento de la pila sería completamente desorganizado.
+* Podría suceder que un día necesitemos más de una pila; deberemos entonces crear otro vector para el almacenamiento de la pila, otro SP para el nmuevo vecto y probablemente más funciones `push()` y `pop()`.
+* Podría además suceder que no solo necesitemos funciones `push()` y `pop()` sino algunas otras cosas; podemos implementarlas pero intenta imaginar que sucede cuando tenemos docenas de pilas implementadas por separado.
+* Hemos usado el `int` para la pila, pero podríamos querer usar otras pilas definidas para otros tipos: floats, strings o incluso arrays y estructuras.
+
+El enfoque objetivo provee soluciones para cada uno de estos problemas. Nombremos cada uno primero.
+
+* La habilidad para ocultar (proteger) valores seleccionados contra accesos no autorizados es llamado **encapsulación**; los valores encapsulados no pueden ser accedidos ni modificados si deseamos usarlos de forma exclusiva.
+* Cuando tenemos una clase implementando todos los comportamientos necesitamos, podemos producir tantas pilas como deseemos; no necesitamos copiar o replicar ninguna parte de código.
+* La habilidad de enriquecer una pila con nuevas funciones proviene de la **herencia**; podemos crear una nueva clase (o más precisamente una **subclase**) que herede todos los rasgos existentes desde la superclase añadiendo algunas nuevas.
+* Podemos crear una **plantilla** que es una clase generalizada y parametrizada, lista para materializarla en muchas diferentes encarnaciones; su código puede adaptarse para requerimientos variados y, por ejemplo, crear pilas listas para trabajar con otros tipos de datos.
+
+Escribiremos una nueva implementación de una pila desde cero. Usaremos el enfoque objetivo, guiandonos paso por paso en el mundo de la programación de objetos.
+
+## Pilas desde cero
+Usaremos un vector como almacen de la pila y un `int` como SP. Solo debemos colocar ambos en una clase:
+```cpp
+class Stack {
+    int stackStore[100];
+    int sp;
+}
+```
+
+Buscamos encapsular ambas variable y hacerlas inaccesibles desde fuera de la clase. Este tipo de data es llamado **privado** en programación de objetos. Es privada porque solo la clase misma puede accederlas y modificarlas.
+
+Si deseamos marcar alguna parte de los datos de la clase como privados, debemos añadir la keyword `private` antes de la declaración.
+```cpp
+class Stack {
+    private:
+        int stackStore[100];
+        int sp;
+};
+```
+
+Realmente no necesitamos usar la keyword `private` en este punto ya que se asigna por defecto cuando no hay otra opción implicitamente especificada. Sin embargo, es preferible ser estricto de todos modos.
+
+## La pila en acción
+Ahora es momento de las dos funciones que implementen las operaciones `push` y `pop`. El lenguaje C++ asume que una funcion de este tipo (siendo una actividad de clase) puede describirse en dos formas diferentes:
+* **Dentro de la clase**, cuando el cuerpo de la clase contiene una implementación completa del método.
+* **Fuera de la clase**, cuando el cuerpo contiene solo el header de la función; el cuerpo de la función es ubicado fuera de la clase.
+
+Es una decisión propia cuál elegir. Veremos ambos y decidiremos implementar la función `pop()` dentro del cuerpo de la clase, mientras que implementaremos la función `push()` fuera de la clase.
+
+Buscamos invocar estas funciones por lo que serán accesibles para usuarios de la clase (en contraste con las variables declaradas que son ocultas del usuario ordinario de la clase). Este tipo de componente es llamado `public` y usaremos esta keyword para enfatizar este hecho.
+
+La declaración final resuta:
+```cpp
+class Stack {
+    private:
+        int stackStore[100];
+        int sp;
+    public:
+        void push(int value);
+        int pop() {
+            return stackstore[--sp];
+        }
+};
+
+void Stack::push(int value) {
+    stackStore[sp++] = value;
+}
+```
+
+La función que implementa las actividades de la clase y es ubicada fuera del cuerpo de la clase necesita ser descripta en una forma muy específica. Sus nombres deben ser **clasificados** usando el nombre de la clase y el operador `::`.
+
+Nuestra clase no está lista para ser usada aún. Observar que el valor de `sp` no está inicializado. Debemos añadir otra función a nuestra clase, la cual será invocada implicitamente cada vez que una nueva pila sea creada. Llamamos a esta clase **constructor** porque es la responsable de la construcción apropiada de cada nuevo objeto de la clase.
+
+Desafortunadamente no podemos nombrar esta función de la forma que queramos. Su nombre es determinado por los requerimientos del lenguaje C++. Debe ser nombrada igual que la clase.
+
+Hay otro punto importante: **los constructores no son funciones reales**. Estos no retornan ningun type, ni siquiera `void`. Debemos tomar esto en consideración cuando declaramos o definimos un nuevo constructor.
+
+La clase está completa en el siguiente snippet:
+```cpp
+class Stack {
+    private:
+        int stackStore[100];
+        int sp;
+    public:
+        Stack() {
+            sp = 0;
+        }
+
+        void push(int value);
+        int pop() {
+            return stackStore[--sp];
+        }
+};
+
+void Stack::push(int value) {
+    stackStore[sp++] = value;
+}
+```
+
+> [Código de ejemplo de pilas con POO](ejemplos/POOStacks.cpp)
