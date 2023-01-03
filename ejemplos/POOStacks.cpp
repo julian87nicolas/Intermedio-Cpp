@@ -23,12 +23,11 @@ void Stack::push(int value) {
 }
 
 int main () {
-    Stack myStack = Stack();
-    myStack.push(1);
-    myStack.push(2);
-    myStack.push(3);
-    myStack.pop();
-    myStack.pop();
-    myStack.pop();
-    myStack.push(123);
+    Stack littleStack, anotherStack, funnyStack;
+
+    littleStack.push(1);
+    anotherStack.push(littleStack.pop() + 1);
+    funnyStack.push(anotherStack.pop()+2);
+    cout << funnyStack.pop() << endl;
 }
+```
