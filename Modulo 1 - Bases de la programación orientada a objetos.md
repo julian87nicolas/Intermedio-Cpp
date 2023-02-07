@@ -2,6 +2,7 @@
 * [Conceptos básicos de la programación orientada a objetos](#conceptos-básicos-de-la-programación-orientada-a-objetos)
 * [Pilas: una mirada desde dos perspectivas diferente](#pilas-una-mirada-desde-dos-perspectivas-diferentes)
 * [Componentes de clase](#componentes-de-clase)
+* [Componentes estáticos](#componentes-estáticos)
 # Conceptos básicos de la programación orientada a objetos
 El lenguaje C++ fue creado como una herramienta universal para la programación orientada a objetos. Esto no significa que no podamos usarlo para otra metodología de programación. 
 
@@ -341,4 +342,366 @@ int AddingStack::get_sum(){
 > [Código de ejemplo subclase de Stack](ejemplos/POOStackSubClass.cpp)
 
 # Componentes de clase
-1.3.1.1
+Una clase es un conjunto de variables (también llamadas camps o propiedades) y funciones (llamadas métodos). Ambas, son **componentes** de la clase.
+
+La siguiente clase:
+```cpp
+class Class {
+    int value;
+    void set_val(int value);
+    int get_val();
+}
+```
+Posee 3 componentes: una variable tipo `int` llamada `value` y dos funciones llamadas `set_value` y `get_value` respectivamente. El nombre de la clase es `Class`.
+
+Como los 3 componentes son declarados sin usar un **especificador de acceso** (`private`/`public`) todos ellos son **privados**.
+
+Esto significa que una clase declarada del siguiente modo:
+```cpp
+class A {
+    type var;
+}
+```
+Puede ser leida como:
+```cpp
+class A {
+private:
+    type var;
+}
+```
+
+## Especificadores de acceso
+La clase anterior será reescrita para mostrar el uso de los **especificadores de acceso**.
+
+Los componentes `set_value` y `get_value` son públicos (accesibles para todos los usuarios de la clase), mientras que `value` es privado (solo accesible para la clase):
+```cpp
+class Class {
+private:
+    void set_val(int value);
+    int get_val();
+public:
+    int value;
+}
+```
+
+## Creando un objeto
+Supongamos que está en vigor la siguiente declaración:
+```cpp
+Class the_object;
+```
+
+Cualquier objeto de la clase es equipado con todos los componentes definidos en la clase. Esto significa que el objeto `the_object` tiene los mismos 3 componentes que su clase base.
+
+Los componentes públicos están disponibles para su uso. Podemos hacer lo siguiente:
+```cpp
+the_object.set_val(0);
+```
+
+El componente privado está oculto e indefinido. **No** podemos hacer lo siguiente:
+```cpp
+the_object.value = 0;
+```
+
+## Sobreescribiendo nombres de componentes
+Podemos colocar la definición de una función declarada en la clase en la misma clase o fuera de ésta.
+
+Una función que es componente de una clase tiene acceso total a otros componentes de clase, incluso a los privados.
+
+Si cualquier función introduce una entidad de nombre idéntico a cualquier componente de clase, el nombre del componente de clase es **sobreescrito**.
+
+La función `set_value` usa un parámetro llamado `value`. El parámetro sobreescribe el componente de clase llamado `value`. Esto significa que la sentencia:
+```cpp
+value = value;
+```
+aplica al parámetro `value` y **no hace nada con el componente de clase del mismo nombre**.
+
+## Puntero `this`
+Cada objeto es equipado con un componente especial que contiene los siguientes rasgos:
+* Su nombre es `this`.
+* No debe declararse explícitamente (es una palabra clave), por lo que no puede sobrescribirse.
+* Es un puntero al objeto actual - cada objeto tiene su propia copia del puntero `this`.
+
+La regla general dice que:
+* Si `S` es una estructura o clase y `S` tiene un componente llamado C y;
+* Si `p` es un puntero a una estructura/clase de tipo `S`
+* Luego, el componente `C` deberá ser accedido de las siguientes dos formas:
+    * `(*p).C` donde `p` es dereferenciado **explicitamente** para acceder al componente `C`.
+    * `p -> C` donde `p` es dereferenciado **implicitamente** para acceder al componente `C`.
+
+*Esto significa que el componente sobreescrito tambien puede revelarse usando el siguiente método:*
+
+```cpp
+class Class {
+public:
+    void set_val(int value) 
+    { 
+        this -> value = value;
+    }
+    int get_val();
+private:
+     int value;
+};
+```
+
+## Calificación de los nombres de los componentes
+
+Si el cuerpo de cualquier función de clase es dado fuera de la misma, su nombre debe ser calificado con el nombre de la clase y el operador `::`.
+```cpp
+class Class {
+public:
+  void set_val(int value) 
+  { 
+    this -> value = value;
+  }
+  int get_val();
+private:
+  int value;
+};
+
+int Class::get_val() 
+{
+      return value;
+}
+```
+
+Los nombres de las funciones pueden ser sobrecargados al igual que funciones ordinarias. Pueden usarse también parámetros por defecto:
+```cpp
+class Class {
+public:
+  void set_val(int value) 
+  { 
+    this -> value = value;  
+  }
+  void set_val() 
+  { 
+    value = -2; 
+  }
+  int get_val() 
+  { 
+    return value; 
+  }
+private:
+  int value;
+};
+```
+
+## Constructores
+Una función con el mismo nombre que su clase madre es llamado **constructor**. El constructor intenta construir el objeto durante su creación, es decir, inicializa valores, ubica memoria, crea otros objetos, etc. El constructor puede acceder a todos los componentes del objeto, al igual que cualquier otra función de la clase pero **no debes ser invocado directamente**.
+
+Además el constructor **no debe ser declarado usando una especificación de tipo de retorno**, incluyendo void.
+
+La siguiente clase:
+```cpp
+class Class {
+public:
+    Class() 
+    { 
+        this -> value = -1; 
+    }
+    void set_val(int value) 
+    { 
+        this -> value = value; 
+    }
+    int get_val() 
+    { 
+        return value; 
+    }
+private:
+    int value;
+};
+```
+Es equipada con un constructor que inicializa el valor de `value` en `-1`.
+
+Declarando el objeto de la clase del siguiente modo:
+```cpp
+Class object;
+```
+Invocamos implicitamente al constructor.
+
+## Sobrecargando constructores
+Los constructores también pueden ser sobrecargados, dependiendo de las necesidades y requerimientos especificos.
+```cpp
+class Class {
+public:
+    Class() 
+    { 
+        this -> value = -1; 
+    }
+    Class(int val) 
+    { 
+        this -> value = val; 
+    }
+    void set_val(int value) 
+    { 
+        this -> value = value; 
+    }
+    int get_val() 
+    { 
+        return value; 
+    }
+private:
+    int value;
+};
+```
+La clase anterior tiene dos constructores diferentes que difieren en su número de parámetros. El segundo requiere un parámetro (el primero ninguno) y setea el campo `value` con el parámetro recibido.
+
+El constructor es seleccionado durante la creación del objeto:
+```cpp
+Class object1, object2(100);
+cout << object1.get_val() << endl;
+cout << object2.get_val() << endl;
+```
+
+El snippet de código anterior da como resultado:
+```
+-1
+100
+```
+
+Si una clase tiene al menos un constructor, uno de estos debe ser usado durante la creación del objeto, es decir, no está permitido escribir una declaración que no especifique un constructor objetivo.
+
+## Copiando constructores
+Existe un tipo especial de constructor destinado a copiar un objeto en otro. Los constructores de este tipo tienen **un parámetro** referenciado a un objeto de la misma clase y es usado para copiar todos los datos imporantes de un objeto fuente al objeto nuevamente creado (o más precisamente, al objeto **actualmente creado**).
+
+Se denominan constructores de copia (*copying constructors*) y son implicitamente invocados cuando una declaración de un objeto es seguida de un iniciador. Esto puede además ser invocado si la declaración especifica un constructor adecuado para la misma.
+
+La palabra "Copia" no debe ser tomada literalmente. Los datos del objeto no necesitan ser copiados actualmente. Pueden solo ser manipulados y procesados. Lo que es más importante es que los datos se tomen de un objeto diferente de la misma clase (o similar). Si el constructor de copia no existe dentro de una clase concreta y el iniciador se utiliza realmente durante la declaración de un objeto, su contenido se copiará realmente (en un sentido literal) "campo por campo", como si el objeto hubiera sido clonado.
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class1 {
+public:
+	Class1(int val) 
+	{ 
+		this -> value = val; 
+	}
+	Class1(Class1 const &source) 
+	{ 
+		value = source.value + 100; 
+	}
+	int value;
+};
+
+class Class2 {
+public:
+	Class2(int val) 
+	{ 
+		this -> value = val; 
+	}
+	int value;
+};
+
+int main() 
+{
+	Class1 object11(100), object12 = object11;
+	Class2 object21(200), object22 = object21;
+
+	cout << object12.value << endl;
+	cout << object22.value << endl;
+}
+```
+
+En el codigo anterior, la keyword `const` es una promesa de que la función no intentará modificar los valores almacenados en el objeto dereferenciado.
+
+El código de ejemplo muestra dos clases diferentes. La primera tiene un copying constructor, mientras que la segunda no. Dos objetos son creados para ambas clases mientras que el segundo de los objeto es creado copiando a los primeros.
+
+El programa da como salida:
+```
+200
+200
+```
+
+La clase `Class1` construye un nuevo objeto incrementando su valor en 100.
+
+## Fugas de memoria
+Los constructores que hemos visto hasta ahora han hecho su trabajo iniciando objetos, pero ninguna de sus acciones ha tenido que ser revertida. En otras palabras, no había nada que limpiar después de que el objeto terminara su vida.
+
+Esto es bastante raro en la programación real. Muchos de los objetos son ubican memoria que necesitan para su operación. Esta memoria podría ser liberada cuando el objeto finaliza su actividad y la mejor forma de hacerlo es realizando una limpieza automática. Una falla en la limpieza causa un fenómeno llamado **Memory leaking** o fuga de memoria, donde la memoria no usada (pero aún ubicada) crece en tamaño afectando el rendimiento del sistema.
+
+Podemos provocar intencionalmente una fuga de memoria con el siguiente código:
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class {
+public:
+	Class(int val) 
+	{ 
+		value = new int[val]; 
+		cout << "Allocation (" << val << ") done." << endl; 
+	}
+	int *value;
+};
+
+void make_a_leak() 
+{
+	Class object(1000);
+}
+
+int main() 
+{
+	make_a_leak();
+}
+```
+
+La clase `Class` tiene solo un constructor, que es responsable de ubicar memoria del tamaño especificado por el valor de su parámetro. El objeto de esta clase es creado como una variable local dentro de la función `make_a_leak()`.
+
+Podemos imaginar que la creación consiste de dos fases:
+1. El objeto en si es creado y una parte de la **memoria es implicitamente ubicada** en el objeto.
+2. El constructor **explicitamente ubica otra parte de la memoria**.
+
+La variable `object` es un ejemplo de una variable *automática*. Esto significa que la variable automáticamente termina su vida cuando la ejecución de la función que contiene la declaración de las variables termina.
+
+## Destructores
+Podemos protegernos contra peligros definiendo una función especial llamada **destructor**. Los destructores tienen las siguientes restricciones:
+* Si una clase es llamada `X` su destructor es llamado `~X`.
+* Una clase **no puede tener más de un destructor**.
+* Un destructor **debe ser una función sin parámetros**
+* Un destructor no debe ser invocado explicitamente.
+
+El siguiente ejemplo muestra la clase anterior un poco modificada - **añadimos un destructor a la clase**. El destructor libera memoria ubicada en el campo `value` protegiendonos de fugas de memoria.
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class {
+public:
+	Class(int val) 
+	{ 
+		value = new int[val]; 
+		cout << "Allocation (" << val << ") done." << endl; 
+	}
+	~Class() 
+	{
+		delete [] value;
+		cout << "Deletion done." << endl;
+	}
+	int *value;
+};
+
+void make_a_leak() 
+{
+	Class object(1000);
+}
+
+int main() 
+{
+	make_a_leak();
+}
+```
+
+El programa en el editor, cuando se compila y ejecuta, muestra las siguientes dos líneas en la pantalla:
+
+```
+Allocation (1000) done.
+Deletion done.
+```
+
+# Componentes estáticos
+1.4.1.1
