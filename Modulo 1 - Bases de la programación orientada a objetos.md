@@ -1100,4 +1100,5 @@ La opción restante es simple. No necesitamos hacer ningún experimento para enc
 Está claro que es posible, lo hemos hecho anteriormente.
 
 > El cuadro completo con estas cuatro posibilidades resulta:
+
 ![](img/static-vs-nonstatic.png)
