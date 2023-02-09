@@ -3,6 +3,7 @@
 * [Pilas: una mirada desde dos perspectivas diferente](#pilas-una-mirada-desde-dos-perspectivas-diferentes)
 * [Componentes de clase](#componentes-de-clase)
 * [Componentes estáticos](#componentes-estáticos)
+* [Objetos y punteros](#objetos-y-punteros)
 # Conceptos básicos de la programación orientada a objetos
 El lenguaje C++ fue creado como una herramienta universal para la programación orientada a objetos. Esto no significa que no podamos usarlo para otra metodología de programación. 
 
@@ -1102,3 +1103,6 @@ Está claro que es posible, lo hemos hecho anteriormente.
 > El cuadro completo con estas cuatro posibilidades resulta:
 
 ![](img/static-vs-nonstatic.png)
+
+# Objetos y punteros
+1.5.1.1
