@@ -145,8 +145,7 @@ int pop() {
 }
 ```
 
-
-> [Código de ejemplo de pilas](ejemplos/Stacks.cpp)
+> [Código de ejemplo de pilas](ejemplos/InitialStacks.cpp)
 
 ## Pros y contras
 Nuestra pila está lista. Por supuesto tiene algunas falencias y la implementación puede ser mejorada de muchas formas, pero la idea general está bien y podemos usar nuestra pila si la necesitamos.
