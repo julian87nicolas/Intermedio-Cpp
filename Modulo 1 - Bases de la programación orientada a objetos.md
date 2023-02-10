@@ -1105,4 +1105,416 @@ Está claro que es posible, lo hemos hecho anteriormente.
 ![](img/static-vs-nonstatic.png)
 
 # Objetos y punteros
-1.5.1.1
+Hemos tratado a los objetos como variables ordinarias y asumido que un objeto es creado en el lugar donde es declarado y destruido cuando el alcance de su declaraćión termina. Esta es solo una de las muchas encarnaciones posibles de un objeto.
+
+Los objetos podrían existir también como entidades creadas y destruidas dinámicamente. En otras palabras, **los objetos pueden aparecer bajo demanda** y desaparecer del mismo modo.
+
+En el siguiente ejemplo definimos una clase llamada `Class` que no posee campos ni funciones. Es solo un constructor y un destructor con la clase. Estos no hacen más que anunciar que han sido invocados.
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class {
+public:
+	Class() 
+	{
+		cout << "Object constructed!" << endl;
+	}
+	~Class() 
+	{
+		cout << "Object destructed!" << endl;
+	}
+};
+
+int main() 
+{
+	Class *ptr = new Class();
+
+	delete ptr;
+}
+```
+
+El `main` declara la variable `ptr` que es un puntero a objeto de la clase `Class`. Luego hemos creado un objeto de esta clase usando la keyword `new`. Podemos omitir los paréntesis vacíos luego del nombre de la clase para invocar un constructor sin parámetros.
+
+Finalmente, el objeto es destruído usando la keyword `delete`. El proceso de destrucción del objeto comienza con la invocación implícita de su destructor. En efecto, el programa producirá la siguiente salida:
+```
+Object constructed!
+Object destructed!
+```
+
+## Punteros a campos
+Todas las variables creadas de la forma "ordinaria" persisten en un área separada de memoria llamada **stack**. Es una región de memoria dedicada a **almacenar todas las entidades automáticas**.
+
+El *stack* varía durante la ejecución del programa, crece cuando una nueva variable automática es creada y decrece cuando la variable deja de ser necesitada. Este proceso escapa a nuestro control, no podemos afectar el modo en que el stack cambia.
+
+Las entidades creadas "bajo demanda" (con la keyword `new`) son creadas en una región específica de memoria usualmente llamada **head**. A diferencia del *stack*, el *heap* está totalmente bajo nuestro control. Nosotros definimos cuantas variables, arreglos, objetos, etc. ocuparán el heap y depende de nosotros cuando estas entidades terminen sus vidas.
+
+Se debe acceder al objeto almacenado en el heap de una forma que se asemeja al acceso a estructuras dinámicamente almacenadas. No debemos usar la notación de "punto" ya que no hay ningun objeto que pueda desempeñar el papel de argumento a la izquierda del operador `.`. **Necesitamos usar el operador flecha `->`**.
+
+En el siguiente ejemplo agregamos un campo `value` a la clase anterior declarado en su parte pública. Debemos usar el operador flecha para acceder al mismo.
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class {
+public:
+	Class()
+	{
+		cout << "Object constructed!" << endl;
+	}
+
+	~Class()
+	{
+		cout << "Object destructed!" << endl;
+	}
+
+	int value;
+};
+
+int main()
+{
+	Class *ptr = new Class;
+
+	ptr -> value = 0;
+	cout << ++(ptr -> value) << endl;
+	delete ptr;
+}
+```
+
+El programa produce la siguiente salida:
+```
+Object constructed!
+1
+Object destructed!
+```
+
+## Punteros a funciones
+Las funciones parte de un objeto accedido mediante un puntero deben ser accedidas usando el operador flecha también.
+
+En el siguiente ejemplo se añade a la clase un función:
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Class {
+public:
+	Class()
+	{
+		cout << "Object constructed!" << endl;
+	}
+	
+	~Class()
+	{
+		cout << "Object destructed!" << endl;
+	}
+
+	void inc_and_print()
+	{
+		cout << "value = " << ++value << endl;
+	}
+
+	int value;
+};	
+
+int main()
+{
+	Class *ptr = new Class;
+	
+	ptr -> value = 1;
+	ptr -> inc_and_print();
+	delete ptr;
+}
+```
+
+El programa produce la siguiente salida:
+```
+Object constructed!
+value = 2
+Object destructed!
+```
+
+## Más de punteros a objetos
+En el siguiente ejemplo tenemos una clase que implementa un array muy simple con elementos tipo `int`. El tamaño del array es determinado por los parámetros pasados al constructor de la clase.
+
+```cpp
+class Array {
+	int *values;
+	int  size;
+public:
+	Array(int size)
+	{ 
+		this -> size = size; 
+		values = new int[size];
+		cout << "Array of " << size << " ints constructed." << endl; 
+	}
+	~Array()
+	{ 
+		delete [] values; 
+		cout << "Array of " << size << " ints destructed." << endl; 
+	}
+	int get(int index)
+	{ 
+		return values[index];
+	}
+	void put(int index, int value) 
+	{ 
+		values[index] = value;
+	}
+};
+```
+
+La clase nos ofrece dos métodos para acceder al array:
+* `get()` retorna el valor del elemento almacenado en la celda de índice especificado por el valor del parámetro.
+* `put()` capaz de setear un nuevo valor de la celda seleccionada (los parámetros de la función especifican indice y valor, respectivamente).
+
+El `main` realiza una simple operacion de prueba ed la clase y da la respectiva salida:
+
+```cpp
+int main()
+{
+	Array *arr = new Array(2);
+	
+	for(int i = 0; i < 2; i++)
+		arr -> put(i, i + 100);
+	for(int i = 0; i < 2; i++)
+		cout << "#" << i + 1 << ":" << arr -> get(i) << endl;
+	delete arr;
+}
+```
+
+```
+Array of 2 ints constructed.
+#1:100
+#2:101
+Array of 2 ints destructed.
+```
+
+## Vectores de punteros a objetos
+No existen obstáculos para recopilar punteros a objetos dentro de un vector. El siguiente `main` muestra la sintaxis necesaria para usarlo como una *collection*.
+
+La clase `Array` es la misma que en el ejemploanterior. En el `main` ahora usamos dos objetos de la clase `Array` y los almacenamos en el vector `ptrvect`.
+
+```cpp
+int main()
+{
+    vector<Array *> ptrvect = { new Array(2), new Array(2) };
+
+    for(int i = 0; i < 2; i++)
+        for(int j = 0; j < 2; j++)
+            ptrvect[i] -> put(j, j + 10 + i);
+    for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++)
+            cout << "#" << i + 1 << ":" << ptrvect[i] -> get(j) << "; ";
+        cout << endl;
+    }
+    delete ptrvect[0];
+    delete ptrvect[1];
+}
+```
+
+El programa produce la siguiente salida:
+```
+Array of 2 ints constructed.
+Array of 2 ints constructed.
+#1:10; #1:11;
+#2:11; #2:12;
+Array of 2 ints destructed.
+Array of 2 ints destructed.
+```
+
+[Ejemplo completo](ejemplos/VectPointerObject.cpp)
+
+## Objetos dentro de objetos
+Un objeto de cualquier clase puede ser un campo de un objeto de cualquier otra clase.
+
+El siguiente ejemplo sencillo muestra una clase llamada `Element` prevista para almacenar un valor `int`.
+
+```cpp
+class Element {
+	int value;
+public:
+	int get()
+	{ 
+		return value; 
+	}
+	void put(int value)
+	{ 
+		this -> value = value;
+	}
+};
+```
+
+La segunda clase tiene dos campos de la clase `Element`:
+
+```cpp
+class Collection {
+	Element el1, el2;
+public:	
+	int get(int elno)
+	{ 
+		return elno == 1 ? el1.get() : el2.get(); 
+	}
+	void put(int elno, int val)
+	{ 
+		if(elno == 1) 
+			el1.put(val); 
+		else
+			el2.put(val); 
+	}
+};
+```
+
+Como vemos, podemos manipularlos con poca dificultad. Se comportan simplemente como cualquier otro componente de clase.
+
+El código completo del ejemplo resulta:
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Element {
+	int value;
+public:
+	int get()
+	{ 
+		return value; 
+	}
+	void put(int value)
+	{ 
+		this -> value = value;
+	}
+};
+
+class Collection {
+	Element el1, el2;
+public:	
+	int get(int elno)
+	{ 
+		return elno == 1 ? el1.get() : el2.get(); 
+	}
+	void put(int elno, int val)
+	{ 
+		if(elno == 1) 
+			el1.put(val); 
+		else
+			el2.put(val); 
+	}
+};
+
+int main()
+{
+	Collection coll;
+	
+	for(int i = 1; i <= 2; i++)
+		coll.put(i, i + 1);
+	for(int i = 1; i <= 2; i++)
+		cout << "Element #" << i << " = " << coll.get(i) << endl;
+}
+```
+
+El cual da la siguiente salida:
+```
+Element #1 = 2
+Element #2 = 3
+```
+
+## Notación especial para constructores
+Modificamos una vez más el código anterior, ahora el contructor de la clase `Element` es:
+
+```cpp
+Element(int value)
+{ 
+    this -> value = value;
+    cout << "Element(" << val << ") constructed!" << endl; 
+}
+```
+
+Ahora este contructor necesita recibir un parámetro, si no modificamos la clase `Collection` recibiremos el siguiente error:
+
+```
+In constructor 'Collection::Collection()':
+error: no matching function for call to 'Element::Element()'
+```
+
+El constructor implicitamente invocado es el que no tiene parámetros. No hemos creado dicho constructor para la clase `Element`, el único disponible es que requiere de un parámetro, lo que hace que nuestro programa sea incorrecto.
+
+*¿Cómo podemos decirle al compilador que deseamos que use otro constructor en lugar del constructor por defecto?* En C++ existe una sintáxis especial para este tipo de situaciones.
+
+Si deseamos que un contructor diferente del por defecto sea invocado durante la creación de un objeto que es parte de otro objeto debemos usar la siguiente sintaxis:
+
+```cpp
+Class(...) : contructor_field_interno1(…), contructor_field_interno2(…) { … }
+```
+
+Esto significa que tenemos que listar todos los constructores de los objetos interno que deseamos usar en lugar de los constructores por defecto.
+
+En nuestro código de ejemplo se hace con la siguiente línea:
+```cpp
+Collection() : el2(2), el1(1) {
+    ...
+}
+```
+
+Así el programa será compilado de manera satisfactoria produciendo la siguiente salida:
+```
+Element(1) constructed!
+Element(2) constructed!
+Collection constructed!
+```
+
+Si vemos la clase completa:
+```cpp
+class Collection {
+    Element el1, el2;
+public: 
+    Collection() : el2(2), el1(1) 
+    { 
+        cout << "Collection constructed!" << endl; 
+    }
+    int get(int elno) 
+    { 
+        return elno == 1 ? el1.get() : el2.get(); 
+    }
+    void put(int elno, int val)
+    { 
+        if(elno == 1) 
+            el1.put(val); 
+        else 
+            el2.put(val); 
+    }
+};
+```
+Notamos que los constructores internos son invocados en una secuencia inversa al orden de declaración:
+```cpp
+Element el1, el2;
+...
+Collection() : el2(2), el1(1)
+```
+
+Esto se debe a que cuando el constructor es divido entre declaración y definición, la lista de consrtuctores alternativos debe estar asociada con la definición, no la declaración.
+
+Esto indica que el siguiente snippet es correcto:
+
+```cpp
+class X {
+public:
+    X(int x) {};
+}
+
+class Y {
+    X x;
+public:
+    Y(int x);
+};
+
+Y::Y(int x) :  x(1) {};
+```
+
+[Código completo](ejemplos/ObjectInsideObjects.cpp)
+
