@@ -187,17 +187,101 @@ Estas tres keywords pueden ser usadas en contextos completamente diferentes para
 
 Veamos la siguiente tabla
 
-| Cuando el componente es declarado como: | Cuando la clase es heredada como | El acceso resultante dentro de la subclase es: |
-| --- | --- | --- |
-| public      | public    | public    |
-| protected   | public    | protected |
-| private     | public    | none      |
-| public      | protected | protected |
-| protected   | protected | protected |
-| private     | protected | none      |
-| public      | private   | private   |
-| protected   | private   | private   |
-| private     | private   | none      |
+<table>
+    <theader>
+        <th>
+            Cuando el componente es declarado como:
+        </th>
+        <th>
+            Cuando el componente es declarado como:
+        </th>
+        <th>
+            Cuando el componente es declarado como:
+        </th>
+    </theader>
+    <tr>
+        <td>
+        public
+        </td>
+        <td rowspan=3>
+        public
+        </td>
+        <td>
+        public
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        protected
+        </td>
+        <td>
+        protected
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        private
+        </td>
+        <td>
+        none
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        public
+        </td>
+        <td rowspan=3>
+        protected
+        </td>
+        <td>
+        protected
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        protected
+        </td>
+        <td>
+        protected
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        private
+        </td>
+        <td>
+        none
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        public
+        </td>
+        <td rowspan=3>
+        private
+        </td>
+        <td>
+        private
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        protected
+        </td>
+        <td>
+        private
+        </td>  
+    </tr>
+    <tr>
+        <td>
+        private
+        </td>
+        <td>
+        none
+        </td>  
+    </tr>
+
+</table>
 
 Terminamos el tópico con un ejemplo muy simple de multiherencia. Necesitamos enfatizar que el uso de está técnica es conocida como *una jerarquía de clases propensa a errores y ofuscadora.*
 
