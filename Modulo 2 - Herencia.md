@@ -1,5 +1,6 @@
 # Contenido
 * [Jerarquía de clases](#jerarquía-de-clases)
+* [Clases, herencia y compatibilidad de tipo](#clases-herencia-y-compatibilidad-de-tipos)
 
 # Jerarquía de clases
 Podemos usar cada clase como una base (o fundación) para definir o construir otra clase (**una sublase**). Además es posible usar **más de una clase para definir una subclase**. Podemos ver ambos casos en la siguiente figura:
@@ -289,3 +290,5 @@ Cualquier solución que evite la multiherencia es generalmente mejor, de hecho m
 
 [Ejemplo multiherencia](ejemplos/MultiHierarchy.cpp)
 
+# Clases, herencia y compatibilidad de tipos
+2.2.1.1
